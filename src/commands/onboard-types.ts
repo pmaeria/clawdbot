@@ -8,6 +8,7 @@ export type AuthChoice =
   | "openai-codex"
   | "codex-cli"
   | "antigravity"
+  | "google-gemini-cli"
   | "apiKey"
   | "gemini-api-key"
   | "minimax"

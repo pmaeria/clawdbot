@@ -85,6 +85,10 @@ export function buildAuthChoiceOptions(params: {
     value: "antigravity",
     label: "Google Antigravity (Claude Opus 4.5, Gemini 3, etc.)",
   });
+  options.push({
+    value: "google-gemini-cli",
+    label: "Google Gemini CLI (Gemini 2.0/2.5)",
+  });
   options.push({ value: "gemini-api-key", label: "Google Gemini API key" });
   options.push({ value: "apiKey", label: "Anthropic API key" });
   options.push({ value: "minimax", label: "Minimax M2.1 (LM Studio)" });

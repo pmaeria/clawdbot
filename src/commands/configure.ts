@@ -12,6 +12,7 @@ import {
 } from "@clack/prompts";
 import {
   loginAnthropic,
+  loginGeminiCli,
   loginOpenAICodex,
   type OAuthCredentials,
   type OAuthProvider,
@@ -516,6 +517,95 @@ async function promptAuthConfig(
       }
     } catch (err) {
       spin.stop("Antigravity OAuth failed");
+      runtime.error(String(err));
+      note("Trouble with OAuth? See https://docs.clawd.bot/start/faq", "OAuth");
+    }
+  } else if (authChoice === "google-gemini-cli") {
+    const isRemote = isRemoteEnvironment();
+    note(
+      isRemote
+        ? [
+            "You are running in a remote/VPS environment.",
+            "A URL will be shown for you to open in your LOCAL browser.",
+            "After signing in, copy the redirect URL and paste it back here.",
+          ].join("\n")
+        : [
+            "Browser will open for Google Cloud Code Assist OAuth.",
+            "This provides free access to Gemini 2.0/2.5 models.",
+            "The callback will be captured automatically on localhost:51121.",
+          ].join("\n"),
+      "Gemini CLI OAuth",
+    );
+    const spin = startOscSpinner("Starting OAuth flow…");
+    let oauthCreds: OAuthCredentials | null = null;
+    try {
+      oauthCreds = await loginGeminiCli(
+        async ({ url, instructions }) => {
+          if (isRemote) {
+            spin.stop("OAuth URL ready");
+            runtime.log(`\nOpen this URL in your LOCAL browser:\n\n${url}\n`);
+            if (instructions) runtime.log(instructions);
+          } else {
+            spin.update("Complete sign-in in browser…");
+            await openUrl(url);
+            runtime.log(`Open: ${url}`);
+          }
+        },
+        (msg) => spin.update(msg),
+        isRemote
+          ? async () => {
+              const callback = guardCancel(
+                await text({
+                  message: "Paste the full redirect URL from your browser:",
+                  placeholder: "http://localhost:51121/oauth-callback?code=...",
+                  validate: (value) => (value?.trim() ? undefined : "Required"),
+                }),
+                runtime,
+              );
+              return String(callback);
+            }
+          : undefined,
+      );
+      spin.stop("Gemini CLI OAuth complete");
+      if (oauthCreds) {
+        await writeOAuthCredentials("google-gemini-cli", oauthCreds);
+        next = applyAuthProfileConfig(next, {
+          profileId: `google-gemini-cli:${oauthCreds.email ?? "default"}`,
+          provider: "google-gemini-cli",
+          mode: "oauth",
+          email: oauthCreds.email ?? undefined,
+        });
+        // Set default model to Gemini 2.5 Flash via Gemini CLI
+        next = {
+          ...next,
+          agent: {
+            ...next.agent,
+            model: {
+              ...(next.agent?.model &&
+              "fallbacks" in (next.agent.model as Record<string, unknown>)
+                ? {
+                    fallbacks: (next.agent.model as { fallbacks?: string[] })
+                      .fallbacks,
+                  }
+                : undefined),
+              primary: "google-gemini-cli/gemini-3-pro-preview",
+            },
+            models: {
+              ...next.agent?.models,
+              "google-gemini-cli/gemini-3-pro-preview":
+                next.agent?.models?.[
+                  "google-gemini-cli/gemini-3-pro-preview"
+                ] ?? {},
+            },
+          },
+        };
+        note(
+          "Default model set to google-gemini-cli/gemini-3-pro-preview",
+          "Model configured",
+        );
+      }
+    } catch (err) {
+      spin.stop("Gemini CLI OAuth failed");
       runtime.error(String(err));
       note("Trouble with OAuth? See https://docs.clawd.bot/start/faq", "OAuth");
     }
