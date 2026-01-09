@@ -232,7 +232,7 @@ export function buildProgram() {
     .option("--mode <mode>", "Wizard mode: local|remote")
     .option(
       "--auth-choice <choice>",
-      "Auth: oauth|claude-cli|openai-codex|codex-cli|antigravity|gemini-api-key|apiKey|minimax|skip",
+      "Auth: oauth|claude-cli|openai-codex|codex-cli|antigravity|google-gemini-cli|gemini-api-key|apiKey|minimax|skip",
     )
     .option("--anthropic-api-key <key>", "Anthropic API key")
     .option("--gemini-api-key <key>", "Gemini API key")

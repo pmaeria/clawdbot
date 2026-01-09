@@ -166,7 +166,7 @@ Options:
 - `--workspace <dir>`
 - `--non-interactive`
 - `--mode <local|remote>`
-- `--auth-choice <oauth|claude-cli|openai-codex|codex-cli|antigravity|gemini-api-key|apiKey|minimax|skip>`
+- `--auth-choice <oauth|claude-cli|openai-codex|codex-cli|antigravity|google-gemini-cli|gemini-api-key|apiKey|minimax|skip>`
 - `--anthropic-api-key <key>`
 - `--gemini-api-key <key>`
 - `--gateway-port <port>`
