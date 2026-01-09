@@ -306,6 +306,7 @@ async function promptAuthConfig(
     | "openai-codex"
     | "codex-cli"
     | "antigravity"
+    | "google-gemini-cli"
     | "gemini-api-key"
     | "apiKey"
     | "minimax"
